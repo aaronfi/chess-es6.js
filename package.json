@@ -1,0 +1,23 @@
+{
+  "name": "engine",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "MD5": "^1.2.1",
+    "assert": "^1.3.0",
+    "babel": "^5.0.9",
+    "babel-core": "^5.0.9",
+    "babel-loader": "^5.0.0",
+    "closurecompiler": "^1.5.2",
+    "fs": "*",
+    "mocha": "1.*",
+    "object-assign": "^4.0.1",
+    "uglify-js": "^2.4.24",
+    "webpack": "^1.12.0",
+    "webpack-closure-compiler": "^1.0.0"
+  },
+  "devDependencies": {
+    "closurecompiler": ">=1.0.2"
+  }
+}

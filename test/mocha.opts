@@ -1,0 +1,3 @@
+--ui tdd
+--timeout 16000
+--inline-diffs 
