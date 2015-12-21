@@ -308,15 +308,28 @@ class BoardVariation {
     }
 
     moves(options = {
-        onlyAlgebraicSquares: false
+        onlyAlgebraicSquares: false,
+        onlyDestinationSquares: false,
+        onlyForSquare: undefined
     }) {
         // no event logging;  this method is user facing, but is not involved with puzzle interaction
 
+        let moves;
         if (options.onlyAlgebraicSquares) {
-            return this._generateMoves({ calculateSan: false }).map(move => move.algebraic);
+            moves = this._generateMoves({ calculateSan: false }).map(move => move.algebraic);
+
+            if (options.onlyForSquare) {
+                moves = moves.filter(move => move.substring(0,2) === options.onlyForSquare);
+            }
+
+            if (options.onlyDestinationSquares) {
+                moves = moves.map(move => move.substring(3,5));
+            }
         } else {
-            return this._generateMoves({ calculateSan: true }).map(move => move.san);
+            moves = this._generateMoves({ calculateSan: true }).map(move => move.san);
         }
+
+        return moves;
     };
 
     _applyMove(move /* Move object from move.js */) {
@@ -528,6 +541,29 @@ class BoardVariation {
         }
     }
 
+    makeMoveFromAlgebraic(
+        from /* e.g. 'a4', 'b3' */,
+        to   /* e.g. 'a4', 'b3' */,
+        game  /* Game object from game.js */,
+        promotionPieceType = PieceType.QUEEN,
+        metadata = {  // TODO wrap up this move metadata object into its own class, for DRY purposes.  e.g. move_metadata.js
+            comment: null  /* string */,
+            timeTakenToMove: null  /* int */,
+            isPuzzleSolution: null  /* boolean */
+        }
+    ) {
+        let move = Move.createFromAlgebraic(from, to, this, promotionPieceType);
+        if (move) {
+            this.eventLog.add(`makeMoveFromAlgebraic(${from}, ${to}, ...) --> ${move.san}`);
+
+            return this.makeMove(move, game, metadata);
+        } else {
+            this.eventLog.add(`makeMoveFromAlgebraic(${from}, ${to}, ...) --> invalid move`);
+
+            return false;
+        }
+    }
+
     _selectMove(
         i,  // integer, the new value of our selectedMoveHistoryIndex
         options = {
@@ -609,11 +645,11 @@ class BoardVariation {
         //    return null;
         //}
 
-        // TODO(Aaron, 4/3/15) need to hide time_taken_to_move parameter;  should not be exposed to caller;
-        // instead perform internal calculation here;  replace time_taken with boolean flag, ... ???
+        // TODO need to hide timeTakenToMove parameter;  should not be exposed to caller;
+        // instead perform internal calculation here;
 
-        // TODO(aaron,4/7/15) add logic for updating the time_take_to_move of an existing move....
-        // if it's an is_puzzle_solution == true move, and no previous timing value exists.... ???
+        // TODO add logic for updating the timeTakenToMove of an existing move....
+        // if it's an isPuzzleSolution === true move, and no previous timing value exists.... ?
 
         if (options.isUserMove) {
 
@@ -631,14 +667,14 @@ class BoardVariation {
                 // step 1-a:  otherwise, check if the next move has any variations whose first move matches
                 // the requested move.  If found, then we simply advance our move cursor into that variation.
                 //
-                // TODO write a bloody unit test for this
+                // TODO write an unit test for this
                 //
                 for (let i = 0; i < nextMoveContext.childVariations.length; i++) {
                     if (!nextMoveContext.childVariations[i].isContinuation &&  // variations only
                         (nextMoveContext.childVariations[i].moveHistory[0].move.san === move.san
                         || nextMoveContext.childVariations[i].moveHistory[0].move.isWildcard))
                     {
-                        // TODO i need to pass back whether or not the move just made was a "is_puzzle_solution" move
+                        // TODO need to pass back whether or not the move just made was a "isPuzzleSolution" move
                         // that exists in the loaded PGN;  however, this here move() method doesn't reference stored moves[], instead it
                         // uses generate_moves()
                         if (game.descendIntoVariation(i)) {
@@ -680,6 +716,7 @@ class BoardVariation {
 
                 currentMoveContext.childVariations.push(newChildVariation);
                 newChildVariation.makeMove(move, game, metadata, options);  // TODO re-use of options here is suspect
+
                 game.currentVariation = newChildVariation;  // the whole reason we needed to plumb the game object into this method
 
                 return currentMoveContext;
@@ -714,10 +751,10 @@ class BoardVariation {
         //
         // e.g.:  1. e4 {1} e5 {2} 2. d4 {3} d5 {4} (2... d6 {1-4} 3. c4 {1-5} (3. c3 {1-2-5}))
         //
-        // TODO(aaron,4/2/15) I probably want to change this ID scheme from variation_ids to variation_index offset from child_variations;
+        // TODO probably want to change this ID scheme from variation_ids to variation_index offset from child_variations;
         // will make tree traversal significantly easier.  although... what about when a variation is deleted?  hmmm....
 
-        // TODO(aaron 5/3/15) reinstate eventually
+        // TODO reinstate eventually
         /*
          var moveId = '0-';
          var current = this;
@@ -729,6 +766,7 @@ class BoardVariation {
 
          this.moveHistory[this.selectedMoveHistoryIndex].moveId = moveId;
          */
+        // /TODO
 
         this._applyMove(move);
 

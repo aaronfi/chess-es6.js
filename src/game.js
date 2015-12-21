@@ -115,6 +115,21 @@ class Game {
         return this.currentVariation.makeMoveFromSan(san, this, metadata);
     }
 
+    makeMoveFromAlgebraic(
+        from /* e.g. 'a4', 'b3' */,
+        to   /* e.g. 'a4', 'b3' */,
+        promotionPieceType = PieceType.QUEEN,
+        metadata = {}
+    ) {
+        metadata = Object.assign({}, {
+            comment: null,  /* string */
+            timeTakenToMove: null,  /* int */
+            isPuzzleSolution: null  /* boolean */
+        }, metadata);
+
+        return this.currentVariation.makeMoveFromAlgebraic(from, to, this, promotionPieceType, metadata);
+    }
+
     toPgn(options = {}) {
         options = Object.assign({}, {
             maxWidth: 0,
@@ -422,7 +437,7 @@ class Game {
 
     rewindToBeginning() {
         this.eventLog.add('rewindToBeginning()');
-        while (this.currentGame.prev({ shouldLog: false })) {}
+        while (this.prev({ shouldLog: false })) {}
     }
 
     replayToPlyNum(n /* logical ply number, starting from 1 */) {
@@ -519,7 +534,9 @@ class Game {
     isThreefoldRepetition()  { return this.currentVariation.isThreefoldRepetition();  }
 
     moves(options = {
-        onlyAlgebraicSquares: false
+        onlyAlgebraicSquares: false,
+        onlyDestinationSquares: false,
+        onlyForSquare: undefined
     }) {
         return this.currentVariation.moves(options);
     }

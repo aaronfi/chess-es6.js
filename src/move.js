@@ -52,7 +52,7 @@ class Move {
         this.promotionPiece = promotionPiece;
         this.isWildcard = false;
 
-        this.algebraic = this.movedPiece + Move.SQUARES_LOOKUP[this.from] + "-" +  Move.SQUARES_LOOKUP[this.to];  // e.g. "Nd2-d4", "kh7-h8", "Pa2-a4", "pa6-a5"
+        this.algebraic = Move.SQUARES_LOOKUP[this.from] + "-" +  Move.SQUARES_LOOKUP[this.to];  // e.g. "d2-d4", "h7-h8"
 
         this.san = boardVariation ? Move.toSan(this, boardVariation) : undefined;
     }
@@ -92,6 +92,33 @@ class Move {
                 if (moves[i].san.indexOf(sanText) === 0) {
                     return moves[i];
                 }
+            }
+        }
+
+        return false;
+    }
+
+    static createFromAlgebraic(
+        from /* e.g. 'a4', 'b3' */,
+        to   /* e.g. 'a4', 'b3' */,
+        boardVariation /* BoardVariation object */,
+        promotionPieceType = PieceType.QUEEN)
+    {
+        if (!from || !to) {
+            return false;
+        }
+
+        const indexFrom = Move.SQUARES[from];
+        const indexTo = Move.SQUARES[to];
+
+        const moves = boardVariation._generateMoves({ calculateSan: true });
+        for (let i = 0, len = moves.length; i < len; i++) {
+            // prefix match, so as to ignore move decorations, e.g. "Nf3+?!"
+            if (moves[i].from === indexFrom &&
+                moves[i].to   === indexTo &&
+                (!moves[i].promotionPiece || moves[i].promotionPiece.type === promotionPieceType))
+            {
+                return moves[i];
             }
         }
 

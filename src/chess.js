@@ -24,7 +24,7 @@ class Chess {
     }
 
     toString() {
-        return `${this.games.length} game${games.length > 1 ? 's' : ''} loaded.  Game #${this.currentGameNum + 1} selected:\n\n`
+        return `${this.games.length} game${this.games.length > 1 ? 's' : ''} loaded.  Game #${this.currentGameNum + 1} selected:\n\n`
             + this.currentGame.toString();
     }
 
@@ -54,9 +54,11 @@ class Chess {
         return this.currentGame.toPgn(options);
     }
 
-    loadPgn(pgnText, options = {
-        newlineChar: '\r?\n'
-    }) {
+    loadPgn(pgnText, options = {}) {
+        options = Object.assign({}, {
+            newlineChar: '\r?\n'
+        }, options);
+
         // reduce all newlines into \n for simplified parsing
         pgnText = pgnText.replace(new RegExp(options.newlineChar.replace(/\\/g, '\\'), 'g'), '\n');
 
@@ -341,12 +343,28 @@ class Chess {
     // pass-through API methods, alphabetized
     // --------------------------------------
 
+    ascendFromCurrentContinuation() {
+        return this.currentGame.ascendFromCurrentContinuation();
+    }
+
+    ascendFromCurrentVariation() {
+        return this.currentGame.ascendFromCurrentVariation();
+    }
+
     createContinuationFromSan(san /* string, e.g. "Rxa7" or "e8=Q#" */) {
         return this.currentGame.createContinuationFromSan(san);
     }
 
     createVariationFromSan(san /* string, e.g. "Rxa7" or "e8=Q#" */) {
         return this.currentGame.createVariationFromSan(san);
+    }
+
+    descendIntoContinuation(i) {
+        return this.currentGame.descendIntoContinuation(i);
+    }
+
+    descendIntoVariation(i) {
+        return this.currentGame.descendIntoVariation(i);
     }
 
     get(square /* string, e.g. 'a1' */) {
@@ -375,8 +393,18 @@ class Chess {
         return this.currentGame.makeMoveFromSan(san);
     }
 
+    makeMoveFromAlgebraic(
+        from /* e.g. 'a4', 'b3' */,
+        to   /* e.g. 'a4', 'b3' */,
+        promotionPieceType = PieceType.QUEEN
+    ) {
+        return this.currentGame.makeMoveFromAlgebraic(from, to, promotionPieceType);
+    }
+
     moves(options = {
-        onlyAlgebraicSquares: false
+        onlyAlgebraicSquares: false,
+        onlyDestinationSquares: false,
+        onlyForSquare: undefined
     }) {
         return this.currentGame.moves(options);
     }
