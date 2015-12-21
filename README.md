@@ -6,5 +6,7 @@ It also includes the ability to parse PGN variations, as well as traverse the mo
 chess-es6.js can be transpiled down to es5 for peformant use in most web browsers.
 
 Demo site:  http://chessdemo.herokuapp.com
+
 Demo site's repo:  http://github.com/aaronfi/chess-es6-demo
 
+A more detailed README file is coming soon.
