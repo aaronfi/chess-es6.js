@@ -245,7 +245,7 @@ class Chess {
                 case '$':
                     // http://en.wikipedia.org/wiki/Numeric_Annotation_Glyphs
                     end = start + 1;
-                    while(ss.charAt(end) != ' ') {
+                    while(ss.charAt(end).match(/[0-9]/)) {
                         end++;
                     }
 
@@ -257,7 +257,7 @@ class Chess {
                         game.currentVariation.intraMoveAnnotationSlots[game.currentVariation.selectedMoveHistoryIndex + 1] = [glyph];
                     }
 
-                    start = end;
+                    start = end - 1;
                     break;
 
                 default:
