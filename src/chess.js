@@ -224,6 +224,8 @@ class Chess {
                         // TODO this logic is broken;  there could be multiple comments;  need to push onto a .comments array;
                         // TODO figure out the interplay between metadata.comment and intraMoveAnnotationSlots;
                         // you should probably just have metadata link to the given slots?  instead of duplicating?
+                    } else {
+                        game.commentBeforeFirstMove = comment;
                     }
 
                     start = end;
