@@ -259,6 +259,22 @@ class Chess {
 
                     start = end - 1;
                     break;
+                    
+                case '!':
+                case '?':
+                    end = start;
+                    while('!?'.indexOf(ss.charAt(end)) >= 0) {
+                        end++;
+                    }
+
+                    let sanSuffix = ss.substring(start, end);
+
+                    if (prevMove) {
+                        prevMove.metadata.sanSuffix = sanSuffix;
+                    }
+
+                    start = end;
+                    break;    
 
                 default:
                     let sanText;
