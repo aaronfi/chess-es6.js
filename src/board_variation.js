@@ -533,7 +533,11 @@ class BoardVariation {
         if (move) {
             this.eventLog.add(`makeMoveFromSan(${sanText}, ...) --> ${move.san}`);
 
-            return this.makeMove(move, game, metadata);
+            move.fenBefore = this.toFen();
+            const retVal = this.makeMove(move, game, metadata);
+            move.fenAfter = this.toFen();
+
+            return retVal;
         } else {
             this.eventLog.add(`makeMoveFromSan(${sanText}, ...) --> invalid move`);
 
@@ -556,7 +560,11 @@ class BoardVariation {
         if (move) {
             this.eventLog.add(`makeMoveFromAlgebraic(${from}, ${to}, ...) --> ${move.san}`);
 
-            return this.makeMove(move, game, metadata);
+            move.fenBefore = this.toFen();
+            const retVal = this.makeMove(move, game, metadata);
+            move.fenAfter = this.toFen();
+
+            return retVal;
         } else {
             this.eventLog.add(`makeMoveFromAlgebraic(${from}, ${to}, ...) --> invalid move`);
 

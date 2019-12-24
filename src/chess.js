@@ -224,6 +224,8 @@ class Chess {
                         // TODO this logic is broken;  there could be multiple comments;  need to push onto a .comments array;
                         // TODO figure out the interplay between metadata.comment and intraMoveAnnotationSlots;
                         // you should probably just have metadata link to the given slots?  instead of duplicating?
+                    } else {
+                        game.commentBeforeFirstMove = comment;
                     }
 
                     start = end;
@@ -245,7 +247,7 @@ class Chess {
                 case '$':
                     // http://en.wikipedia.org/wiki/Numeric_Annotation_Glyphs
                     end = start + 1;
-                    while(ss.charAt(end) != ' ') {
+                    while(ss.charAt(end).match(/[0-9]/)) {
                         end++;
                     }
 
@@ -257,8 +259,24 @@ class Chess {
                         game.currentVariation.intraMoveAnnotationSlots[game.currentVariation.selectedMoveHistoryIndex + 1] = [glyph];
                     }
 
-                    start = end;
+                    start = end - 1;
                     break;
+                    
+                case '!':
+                case '?':
+                    end = start;
+                    while('!?'.indexOf(ss.charAt(end)) >= 0) {
+                        end++;
+                    }
+
+                    let sanSuffix = ss.substring(start, end);
+
+                    if (prevMove) {
+                        prevMove.metadata.sanSuffix = sanSuffix;
+                    }
+
+                    start = end;
+                    break;    
 
                 default:
                     let sanText;
